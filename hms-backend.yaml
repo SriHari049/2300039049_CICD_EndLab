@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hms-backend-deployment
+  labels:
+    app: hms-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hms-backend
+  template:
+    metadata:
+      labels:
+        app: hms-backend
+    spec:
+      containers:
+        - name: hms-backend
+          image: srihari049/hospital/hms-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            # Add DB environment variables if needed
+            # - name: DB_URL
+            #   value: "jdbc:mysql://mysql:3306/hms"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hms-backend-service
+  labels:
+    app: hms-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: hms-backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
